@@ -1,3 +1,4 @@
+import com.ecs160.MyAnnotation;
 import com.ecs160.Student;
 
 import java.io.File;
@@ -83,6 +84,7 @@ public class ReflectionDemo {
         initializePrivateField(student, false);
         System.out.println("Student is active? " + student.getActive());
         // System.out.println("Trying to access the active field directly" + student.active); // compiler error
+        readAnnotatedFields(student);
 
         /*
         Class clazz = student.getClass();
@@ -96,5 +98,22 @@ public class ReflectionDemo {
             }
         }
          */
+    }
+
+    private static void readAnnotatedFields(Student student) {
+        Class clazz = student.getClass();
+
+        for (Field field: clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(MyAnnotation.class)) {
+                Object value = null;
+                try {
+                    field.setAccessible(true);
+                    value = field.get(student);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Printing annotated field " + field.getName() + " with value: " + value);
+            }
+        }
     }
 }
